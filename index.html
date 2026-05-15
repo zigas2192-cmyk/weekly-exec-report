@@ -57,10 +57,36 @@ header h1{font-size:22px;margin-bottom:4px}header p{font-size:13px;color:#A7F3D0
 .empty{color:var(--gray-500);font-size:11px;font-style:italic;padding:8px;text-align:center}
 @media (max-width:640px){.kpi-grid,.brand-grid,.sales-grid,.detail{grid-template-columns:1fr}body{padding:8px}.section{padding:12px}}
 .footer{text-align:center;font-size:10px;color:var(--gray-500);padding:16px}
+
+.team-section{background:#fff;border-radius:10px;padding:18px;margin-bottom:16px;box-shadow:0 2px 4px rgba(0,0,0,.05)}
+.team-section h2{font-size:16px;color:var(--primary);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--accent);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.team-section.team-alert{border-left:4px solid #DC2626}
+.team-section.team-alert h2{border-bottom-color:#FCA5A5;color:#991B1B}
+.team-section.team-risk{border-left:4px solid #F59E0B}
+.team-section.team-risk h2{border-bottom-color:#FCD34D;color:#92400E}
+.team-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.team-tbl th{background:#F9FAFB;color:#374151;text-align:left;padding:9px 10px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #E5E7EB;white-space:nowrap}
+.team-tbl td{padding:9px 10px;border-bottom:1px solid #F3F4F6;vertical-align:top}
+.team-tbl tbody tr:hover{background:#FAFAFA}
+.team-tbl .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.team-tbl .owner{background:#ECFDF5;color:#065F46;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:600;display:inline-block;white-space:nowrap}
+.team-tbl .reason-cell{color:#6B7280;font-size:11px;line-height:1.35;max-width:340px}
+.team-tbl .growth-up{color:#065F46;font-weight:600}
+.team-tbl .growth-down{color:#991B1B;font-weight:600}
+.team-tbl .growth-new{color:#1E40AF;font-weight:600}
+.team-tbl .growth-dead{color:#991B1B;font-weight:600;background:#FEE2E2;padding:2px 6px;border-radius:4px}
+.action-pill{padding:3px 9px;border-radius:6px;font-size:11px;font-weight:500;display:inline-block;white-space:nowrap}
+.action-urgent{background:#FEE2E2;color:#991B1B}
+.action-call{background:#FEF3C7;color:#92400E}
+.action-watch{background:#DBEAFE;color:#1E40AF}
+.action-keep{background:#D1FAE5;color:#065F46}
+.empty-good{color:#065F46;padding:18px;text-align:center;background:#ECFDF5;border-radius:8px;font-weight:500}
 </style></head><body><div class="wrap">
 <header><h1>⚡ ZIGA INNOVATION — Weekly Executive Dashboard</h1>
 <p>Sales Performance · 2026-05-15 · Generated 2026-05-15 12:45</p></header>
 <div class="kpi-grid" id="kpiGrid"></div>
+<div class="team-section team-alert"><h2>🔴 Account Alert — ทั้งทีม <span id="alertMeta" style="font-size:11px;color:#6B7280;font-weight:normal"></span></h2><div id="teamAlertBox"><div style="overflow-x:auto"><table class="team-tbl" id="teamAlertTbl"><thead><tr><th>ลูกค้า</th><th>Sales Owner</th><th>เหตุผล</th><th>Action</th></tr></thead><tbody></tbody></table></div></div></div>
+<div class="team-section team-risk"><h2>⚠️ Risk Account Top 10 — ทั้งทีม <span id="riskMeta" style="font-size:11px;color:#6B7280;font-weight:normal"></span></h2><div id="teamRiskBox"><div style="overflow-x:auto"><table class="team-tbl" id="teamRiskTbl"><thead><tr><th>ลูกค้า</th><th>Sales Owner</th><th class="num">Avg 6mo</th><th class="num">Avg 2025</th><th class="num">Growth</th><th>Score</th><th>Action</th></tr></thead><tbody></tbody></table></div></div></div>
 <div class="section"><h2>📊 Brand Performance (เดือนปัจจุบัน + YTD)</h2><div class="brand-grid" id="brandGrid"></div></div>
 <div class="section"><h2>📋 SOD รายโครงการเดือนนี้ <span style="font-size:11px;color:#6B7280;font-weight:normal" id="sodProjMeta"></span></h2>
 <div style="overflow-x:auto"><table class="brand-tbl" id="sodProjTbl">
@@ -139,5 +165,9 @@ function renderSodProjects(){const proj=D.sod_projects||[];const tb=document.que
 const total=proj.reduce((a,r)=>a+r.amt,0);
 document.getElementById('sodProjMeta').textContent=`(${proj.length} โครงการ · รวม ${total.toFixed(2)} ลบ. · Top 10 แสดงในตาราง)`;
 tb.innerHTML=proj.slice(0,10).map(r=>{const bg=r.backlog>0?'#FFF8E1':'';return `<tr style="background:${bg}"><td>${r.customer}</td><td>${r.project}</td><td>${r.brand}</td><td>${r.sales}</td><td class="num"><b>${r.amt.toFixed(2)}</b></td><td class="num">${r.ton.toFixed(1)}</td><td class="num" style="color:#991B1B">${r.backlog>0?r.backlog.toFixed(2):'—'}</td></tr>`}).join('');}
-renderKPI();renderBrands();renderSodProjects();renderSales();
+function _actionForAlert(a){const r=(a.reason||a.type||a.detail||'').toLowerCase();if(r.includes('inactive')||r.includes('หาย')||r.includes('ไม่ซื้อ')||r.includes('หยุดซื้อ'))return['action-urgent','🚨 เยี่ยมด่วน — ลูกค้าหาย'];if(r.includes('ยอดตก')||r.includes('drop')||r.includes('ลดลง')||r.includes('↓'))return['action-call','📞 โทรเช็ค + เสนอ QT'];return['action-call','📞 ติดต่อด่วน + เสนอ QT'];}
+function _actionForRisk(r){const sc=parseInt((r.score||'').toString().replace(/[^0-9]/g,''))||0;const g=(r.growth_label||r.growth||'').toString();const num=parseFloat(g.replace(/[^-0-9.]/g,''));if(g.includes('INACTIVE')||g.includes('💀')||sc>=70)return['action-urgent','🚨 เยี่ยมด่วน'];if(g.includes('NEW')||g.includes('🆕'))return['action-watch','👀 Onboard + ติดตาม'];if(!isNaN(num)&&num<=-20)return['action-call','📞 โทรเช็ค + โปรโมชั่น'];if(sc>=40||(!isNaN(num)&&num<0))return['action-watch','👀 จับตา + ติดตาม'];return['action-keep','📋 Maintain + cross-sell'];}
+function renderTeamAlerts(){const tb=document.querySelector('#teamAlertTbl tbody');if(!tb)return;const all=[];(D.individuals||[]).forEach(s=>(s.alerts||[]).forEach(a=>all.push(Object.assign({_owner:s.nick,_bu:s.bu},a))));const meta=document.getElementById('alertMeta');if(meta)meta.textContent=all.length?`(${all.length} ลูกค้า)`:'';if(!all.length){const box=document.getElementById('teamAlertBox');if(box)box.innerHTML='<div class="empty-good">💚 ไม่มี Account Alert ในขณะนี้ — ดีมาก!</div>';return;}tb.innerHTML=all.map(a=>{const[cls,txt]=_actionForAlert(a);return `<tr><td><b>${a.name||a.account||'—'}</b></td><td><span class="owner">${a._owner}</span></td><td class="reason-cell">${a.reason||a.detail||a.type||'—'}</td><td><span class="action-pill ${cls}">${txt}</span></td></tr>`;}).join('');}
+function renderTeamRisks(){const tb=document.querySelector('#teamRiskTbl tbody');if(!tb)return;const all=[];(D.individuals||[]).forEach(s=>(s.risks||[]).forEach(r=>all.push(Object.assign({_owner:s.nick,_bu:s.bu},r))));all.sort((a,b)=>{const sa=parseInt((a.score||'').toString().replace(/[^0-9]/g,''))||0;const sb=parseInt((b.score||'').toString().replace(/[^0-9]/g,''))||0;return sb-sa;});const top=all.slice(0,10);const meta=document.getElementById('riskMeta');if(meta)meta.textContent=top.length?`(แสดง ${top.length} จาก ${all.length} ลูกค้า)`:'';if(!top.length){const box=document.getElementById('teamRiskBox');if(box)box.innerHTML='<div class="empty-good">💚 ไม่มี Risk Account ในขณะนี้ — ดีมาก!</div>';return;}tb.innerHTML=top.map(r=>{const[cls,txt]=_actionForRisk(r);const g=(r.growth_label||r.growth||'').toString();let gcls='';if(g.includes('INACTIVE')||g.includes('💀'))gcls='growth-dead';else if(g.includes('NEW')||g.includes('🆕'))gcls='growth-new';else if(g.includes('-')||g.startsWith('↓'))gcls='growth-down';else if(g.includes('+')||g.startsWith('↑'))gcls='growth-up';return `<tr><td><b>${r.name||r.account||'—'}</b></td><td><span class="owner">${r._owner}</span></td><td class="num">${r.avg_6mo!=null?r.avg_6mo:'—'}</td><td class="num">${r.avg_2025!=null?r.avg_2025:'—'}</td><td class="num ${gcls}">${g||'—'}</td><td>${r.score||'—'}</td><td><span class="action-pill ${cls}">${txt}</span></td></tr>`;}).join('');}
+renderKPI();renderBrands();renderSodProjects();renderTeamAlerts();renderTeamRisks();renderSales();
 </script></body></html>
